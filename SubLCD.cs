@@ -9,25 +9,33 @@ Should return an image with half the width but I didn't bored search how to do i
 
 unsafe void Render(Surface dst, Surface src, Rectangle rect)
 {
+    Rectangle selection = EnvironmentParameters.GetSelection(src.Bounds).GetBoundsInt();
+
+    Surface selectionSurface = new Surface(selection.Width, selection.Height);
+    selectionSurface.CopySurface(src, selection);
+
+    Surface stretchedSurface = new Surface(selection.Width * 2, selection.Height);
+    stretchedSurface.FitSurface(ResamplingAlgorithm.Bicubic, selectionSurface);
+
     ColorBgra t;
-    for (int y = 0; y < src.Height; y++)
+    for (int y = 0; y < stretchedSurface.Height; y++)
     {
-        int v = 0;
-        for (int x = 0; x < src.Width - 1; x += 2)
+        int v = selection.Left;
+        for (int x = 0; x < stretchedSurface.Width; x += 2)
         {
             if (x % 2 == 0)
             {
-                t.R = src[x, y].R;
-                t.G = src[x + 1, y].G;
-                if (x != src.Width - 2)
+                t.R = stretchedSurface[x, y].R;
+                t.G = stretchedSurface[x + 1, y].G;
+                if (x != stretchedSurface.Width - 2)
                 {
-                    t.B = src[x + 2, y].B;
+                    t.B = stretchedSurface[x + 2, y].B;
                 }
                 else
                 {
-                    t.B = (byte)((src[src.Width - 1, y].B + src[src.Width - 2, y].B) >> 1);
+                    t.B = (byte)((stretchedSurface[stretchedSurface.Width - 1, y].B + stretchedSurface[stretchedSurface.Width - 2, y].B) >> 1);
                 }
-                dst[v, y] = ColorBgra.FromBgr(t.B, t.G, t.R);
+                dst[v, y + selection.Top] = ColorBgra.FromBgr(t.B, t.G, t.R);
                 v++;
             }
         }
