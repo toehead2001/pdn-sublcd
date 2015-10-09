@@ -1,13 +1,12 @@
-/*
-Paint.net SubLCD resize plugin by xrl - http://web.ist.utl.pt/tcf
-based on:
-http://www.oyhus.no/SubLCD.html
-
-Should return an image with half the width but I didn't bored search how to do it
-*/
-
-
-unsafe void Render(Surface dst, Surface src, Rectangle rect)
+// Name: SubLCD
+// Submenu:
+// Author: xrl & toe_head2001
+// Title:
+// Desc:
+// Keywords:
+// URL: http://www.getpaint.net/redirect/plugins.html
+// Help:
+void Render(Surface dst, Surface src, Rectangle rect)
 {
     Rectangle selection = EnvironmentParameters.GetSelection(src.Bounds).GetBoundsInt();
 
@@ -20,6 +19,7 @@ unsafe void Render(Surface dst, Surface src, Rectangle rect)
     ColorBgra t;
     for (int y = 0; y < stretchedSurface.Height; y++)
     {
+        if (IsCancelRequested) return;
         int v = selection.Left;
         for (int x = 0; x < stretchedSurface.Width; x += 2)
         {
