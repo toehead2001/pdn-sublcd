@@ -99,27 +99,21 @@ namespace SubLCDEffect
 
             stretchedSurface = new Surface(selection.Width * 2, selection.Height);
             stretchedSurface.FitSurface(ResamplingAlgorithm.Bicubic, selectionSurface);
+
+
+            base.OnSetRenderInfo(newToken, dstArgs, srcArgs);
         }
 
-        protected override unsafe void OnRender(Rectangle[] rois, int startIndex, int length)
+        protected override void OnRender(Rectangle[] renderRects, int startIndex, int length)
         {
             if (length == 0) return;
             for (int i = startIndex; i < startIndex + length; ++i)
             {
-                Render(DstArgs.Surface, SrcArgs.Surface, rois[i]);
+                Render(DstArgs.Surface, SrcArgs.Surface, renderRects[i]);
             }
         }
 
-        #region User Entered Code
-        // Name: SubLCD
-        // Submenu:
-        // Author: xrl & toe_head2001
-        // Title:
-        // Desc:
-        // Keywords:
-        // URL: http://www.getpaint.net/redirect/plugins.html
-        // Help:
-        private Surface stretchedSurface;
+        Surface stretchedSurface;
 
         void Render(Surface dst, Surface src, Rectangle rect)
         {
@@ -151,6 +145,5 @@ namespace SubLCDEffect
             }
         }
 
-        #endregion
     }
 }
