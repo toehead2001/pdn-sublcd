@@ -97,27 +97,10 @@ namespace SubLCDEffect
             Surface selectionSurface = new Surface(selection.Width, selection.Height);
             selectionSurface.CopySurface(srcArgs.Surface, selection);
 
-            stretchedSurface = new Surface(selection.Width * 2, selection.Height);
+            Surface stretchedSurface = new Surface(selection.Width * 2, selection.Height);
             stretchedSurface.FitSurface(ResamplingAlgorithm.Bicubic, selectionSurface);
 
-
-            base.OnSetRenderInfo(newToken, dstArgs, srcArgs);
-        }
-
-        protected override void OnRender(Rectangle[] renderRects, int startIndex, int length)
-        {
-            if (length == 0) return;
-            for (int i = startIndex; i < startIndex + length; ++i)
-            {
-                Render(DstArgs.Surface, SrcArgs.Surface, renderRects[i]);
-            }
-        }
-
-        Surface stretchedSurface;
-
-        void Render(Surface dst, Surface src, Rectangle rect)
-        {
-            Rectangle selection = EnvironmentParameters.GetSelection(src.Bounds).GetBoundsInt();
+            processedSurface = new Surface(srcArgs.Surface.Size);
 
             ColorBgra t;
             for (int y = 0; y < stretchedSurface.Height; y++)
@@ -138,11 +121,30 @@ namespace SubLCDEffect
                         {
                             t.B = (byte)((stretchedSurface[stretchedSurface.Width - 1, y].B + stretchedSurface[stretchedSurface.Width - 2, y].B) >> 1);
                         }
-                        dst[v, y + selection.Top] = ColorBgra.FromBgr(t.B, t.G, t.R);
+                        processedSurface[v, y + selection.Top] = ColorBgra.FromBgr(t.B, t.G, t.R);
                         v++;
                     }
                 }
             }
+
+
+            base.OnSetRenderInfo(newToken, dstArgs, srcArgs);
+        }
+
+        protected override void OnRender(Rectangle[] renderRects, int startIndex, int length)
+        {
+            if (length == 0) return;
+            for (int i = startIndex; i < startIndex + length; ++i)
+            {
+                Render(DstArgs.Surface, SrcArgs.Surface, renderRects[i]);
+            }
+        }
+
+        Surface processedSurface;
+
+        void Render(Surface dst, Surface src, Rectangle rect)
+        {
+            dst.CopySurface(processedSurface, rect.Location, rect);
         }
 
     }
