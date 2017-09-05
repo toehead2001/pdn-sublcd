@@ -10,76 +10,22 @@ namespace SubLCDEffect
 {
     public class PluginSupportInfo : IPluginSupportInfo
     {
-        public string Author
-        {
-            get
-            {
-                return ((AssemblyCopyrightAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false)[0]).Copyright;
-            }
-        }
-        public string Copyright
-        {
-            get
-            {
-                return ((AssemblyDescriptionAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false)[0]).Description;
-            }
-        }
-
-        public string DisplayName
-        {
-            get
-            {
-                return ((AssemblyProductAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0]).Product;
-            }
-        }
-
-        public Version Version
-        {
-            get
-            {
-                return base.GetType().Assembly.GetName().Version;
-            }
-        }
-
-        public Uri WebsiteUri
-        {
-            get
-            {
-                return new Uri("http://www.getpaint.net/redirect/plugins.html");
-            }
-        }
+        public string Author => ((AssemblyCopyrightAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false)[0]).Copyright;
+        public string Copyright => ((AssemblyDescriptionAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false)[0]).Description;
+        public string DisplayName => ((AssemblyProductAttribute)base.GetType().Assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false)[0]).Product;
+        public Version Version => base.GetType().Assembly.GetName().Version;
+        public Uri WebsiteUri => new Uri("http://www.getpaint.net/redirect/plugins.html");
     }
 
     [PluginSupportInfo(typeof(PluginSupportInfo), DisplayName = "SubLCD")]
     [EffectCategory(EffectCategory.Adjustment)]
     public class SubLCDEffectPlugin : PropertyBasedEffect
     {
-        public static string StaticName
-        {
-            get
-            {
-                return "SubLCD";
-            }
-        }
-
-        public static Image StaticIcon
-        {
-            get
-            {
-                return new Bitmap(typeof(SubLCDEffectPlugin), "SubLCD.png");
-            }
-        }
-
-        public static string SubmenuName
-        {
-            get
-            {
-                return null;  // Programmer's chosen default
-            }
-        }
+        private Surface processedSurface;
+        private static readonly Image StaticIcon = new Bitmap(typeof(SubLCDEffectPlugin), "SubLCD.png");
 
         public SubLCDEffectPlugin()
-            : base(StaticName, StaticIcon, SubmenuName, EffectFlags.None)
+            : base("SubLCD", StaticIcon, null, EffectFlags.None)
         {
         }
 
@@ -134,18 +80,8 @@ namespace SubLCDEffect
         protected override void OnRender(Rectangle[] renderRects, int startIndex, int length)
         {
             if (length == 0) return;
-            for (int i = startIndex; i < startIndex + length; ++i)
-            {
-                Render(DstArgs.Surface, SrcArgs.Surface, renderRects[i]);
-            }
+
+            DstArgs.Surface.CopySurface(processedSurface, renderRects, startIndex, length);
         }
-
-        Surface processedSurface;
-
-        void Render(Surface dst, Surface src, Rectangle rect)
-        {
-            dst.CopySurface(processedSurface, rect.Location, rect);
-        }
-
     }
 }
