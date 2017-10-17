@@ -4,7 +4,6 @@ using System.Reflection;
 using PaintDotNet;
 using PaintDotNet.Effects;
 using PaintDotNet.PropertySystem;
-using System.Collections.Generic;
 
 namespace SubLCDEffect
 {
@@ -31,9 +30,7 @@ namespace SubLCDEffect
 
         protected override PropertyCollection OnCreatePropertyCollection()
         {
-            List<Property> props = new List<Property>();
-
-            return new PropertyCollection(props);
+            return PropertyCollection.CreateEmpty();
         }
 
         protected override void OnSetRenderInfo(PropertyBasedEffectConfigToken newToken, RenderArgs dstArgs, RenderArgs srcArgs)
